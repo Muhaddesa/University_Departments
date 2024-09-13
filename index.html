@@ -1,0 +1,47 @@
+<!DOCTYPE html5>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        
+
+    </head>
+    <body>
+        <h1>Select University, Department, and Specialization</h1>
+
+    <!-- University Selection  -->
+    <label for="university">Select University:</label>
+    <select id="university" onchange="populateDepartments()">
+        <option value="">--Select University--</option>
+    </select>
+
+    <!-- Department Selection  -->
+    <label for="department">Select Department:</label>
+    <select id="department" onchange="populateSpecializations()">
+        <option value="">--Select Department--</option>
+    </select>
+
+    <!-- Specialization Selection  -->
+    <label for="specialization">Select Specialization:</label>
+    <select id="specialization" onchange="showStudents()">
+        <option value="">--Select Specialization--</option>
+    </select>
+
+    <!-- Table for Students -->
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Email</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Students will be inserted here  -->
+        </tbody>
+    </table>
+
+
+        <script src="index.js"></script>
+    </body>
+</html>
