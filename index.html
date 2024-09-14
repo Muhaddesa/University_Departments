@@ -7,39 +7,42 @@
     </head>
     <body>
         <h1>Select University, Department, and Specialization</h1>
+        
+  <!-- University Dropdown -->
+  <label for="university">Select University:</label>
+  <select id="university">
+    <option value="">All Universities</option>
+  </select>
 
-    <!-- University Selection  -->
-    <label for="university">Select University:</label>
-    <select id="university" onchange="populateDepartments()">
-        <option value="">--Select University--</option>
-    </select>
+  <!-- Department Dropdown -->
+  <label for="department">Select Department:</label>
+  <select id="department" disabled>
+    <option value="">All Departments</option>
+  </select>
 
-    <!-- Department Selection  -->
-    <label for="department">Select Department:</label>
-    <select id="department" onchange="populateSpecializations()">
-        <option value="">--Select Department--</option>
-    </select>
+  <!-- Specialization Dropdown -->
+  <label for="specialization">Select Specialization:</label>
+  <select id="specialization" disabled>
+    <option value="">All Specializations</option>
+  </select>
 
-    <!-- Specialization Selection  -->
-    <label for="specialization">Select Specialization:</label>
-    <select id="specialization" onchange="showStudents()">
-        <option value="">--Select Specialization--</option>
-    </select>
+  <!-- Students Table -->
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Age</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-    <!-- Table for Students -->
-    <table id="studentsTable">
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Student Name</th>
-                <th>Email</th>
-                <th>Age</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <!-- Students will be inserted here  -->
-        </tbody>
-    </table>
+  <script src="script.js"></script>
+</body>
+</html>
+
 
 
         <script src="index.js"></script>
