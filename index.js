@@ -140,92 +140,108 @@ const universities = [
   }
 ];
 
+const universitySelect = document.getElementById('university');
+const departmentSelect = document.getElementById('department');
+const specializationSelect = document.getElementById('specialization');
+const studentTableBody = document.querySelector('#studentTable tbody');
+
+// Populate universities dropdown
 function populateUniversities() {
-  const universitySelect = document.getElementById('university');
-  for (let i = 0; i < universities.length; i++) {
+  universities.forEach(university => {
+    const option = document.createElement('option');
+    option.value = university.id;
+    option.textContent = university.name;
+    universitySelect.appendChild(option);
+  });
+}
+
+// Populate departments based on selected university
+function populateDepartments(universityId) {
+  departmentSelect.innerHTML = '<option value="">All Departments</option>';
+  specializationSelect.innerHTML = '<option value="">All Specializations</option>';
+  specializationSelect.disabled = true;
+
+  const university = universities.find(u => u.id == universityId);
+
+  if (university) {
+    university.departments.forEach(department => {
       const option = document.createElement('option');
-      option.value = universities[i].id;
-      option.text = universities[i].name;
-      universitySelect.appendChild(option);
-  }
-}
-
-function populateDepartments() {
-  const universitySelect = document.getElementById('university');
-  const departmentSelect = document.getElementById('department');
-  const universityId = parseInt(universitySelect.value);
-
-  departmentSelect.innerHTML = '<option value="">--Select Department--</option>';
-  document.getElementById('specialization').innerHTML = '<option value="">--Select Specialization--</option>'; 
-
-  if (universityId) {
-      const selectedUniversity = universities.find(u => u.id === universityId);
-      for (let i = 0; i < selectedUniversity.departments.length; i++) {
-          const option = document.createElement('option');
-          option.value = selectedUniversity.departments[i].id;
-          option.text = selectedUniversity.departments[i].name;
-          departmentSelect.appendChild(option);
-      }
-  }
-}
-
-function populateSpecializations() {
-  const universitySelect = document.getElementById('university');
-  const departmentSelect = document.getElementById('department');
-  const specializationSelect = document.getElementById('specialization');
-  const universityId = parseInt(universitySelect.value);
-  const departmentId = parseInt(departmentSelect.value);
-
-  specializationSelect.innerHTML = '<option value="">--Select Specialization--</option>';
-
-  if (universityId && departmentId) {
-      const selectedUniversity = universities.find(u => u.id === universityId);
-      const selectedDepartment = selectedUniversity.departments.find(d => d.id === departmentId);
-      for (let i = 0; i < selectedDepartment.specializations.length; i++) {
-          const option = document.createElement('option');
-          option.value = selectedDepartment.specializations[i].id;
-          option.text = selectedDepartment.specializations[i].name;
-          specializationSelect.appendChild(option);
-      }
-  }
-}
-
-function showStudents() {
-  const universitySelect = document.getElementById('university');
-  const departmentSelect = document.getElementById('department');
-  const specializationSelect = document.getElementById('specialization');
-  const universityId = parseInt(universitySelect.value);
-  const departmentId = parseInt(departmentSelect.value);
-  const specializationId = parseInt(specializationSelect.value);
-  const tableBody = document.getElementById('tableBody');
-  const table = document.getElementById('studentsTable');
-
-  tableBody.innerHTML = ''; // Clear previous table data
-
-  if (universityId && departmentId && specializationId) {
-      const selectedUniversity = universities.find(u => u.id === universityId);
-      const selectedDepartment = selectedUniversity.departments.find(d => d.id === departmentId);
-      const selectedSpecialization = selectedDepartment.specializations.find(s => s.id === specializationId);
-
-      for (let i = 0; i < selectedSpecialization.students.length; i++) {
-          const student = selectedSpecialization.students[i];
-          const row = document.createElement('tr');
-          row.innerHTML = `
-              <td>${student.id}</td>
-              <td>${student.name}</td>
-              <td>${student.email}</td>
-              <td>${student.age}</td>
-          `;
-          tableBody.appendChild(row);
-      }
-
-      table.style.display = 'table';
+      option.value = department.id;
+      option.textContent = department.name;
+      departmentSelect.appendChild(option);
+    });
+    departmentSelect.disabled = false;
   } else {
-      table.style.display = 'none';
+    departmentSelect.disabled = true;
   }
 }
 
-// Call this function when the page loads to populate the universities dropdown
-window.onload = function() {
-  populateUniversities();
-};
+// Populate specializations based on selected department
+function populateSpecializations(departmentId) {
+  specializationSelect.innerHTML = '<option value="">All Specializations</option>';
+
+  const university = universities.find(u => u.id == universitySelect.value);
+  const department = university?.departments.find(d => d.id == departmentId);
+
+  if (department) {
+    department.specializations.forEach(spec => {
+      const option = document.createElement('option');
+      option.value = spec.id;
+      option.textContent = spec.name;
+      specializationSelect.appendChild(option);
+    });
+    specializationSelect.disabled = false;
+  } else {
+    specializationSelect.disabled = true;
+  }
+}
+
+// Show students based on filters
+function showStudents() {
+  studentTableBody.innerHTML = '';
+
+  const universityId = universitySelect.value;
+  const departmentId = departmentSelect.value;
+  const specializationId = specializationSelect.value;
+
+  let students = [];
+
+  universities.forEach(university => {
+    if (!universityId || university.id == universityId) {
+      university.departments.forEach(department => {
+        if (!departmentId || department.id == departmentId) {
+          department.specializations.forEach(spec => {
+            if (!specializationId || spec.id == specializationId) {
+              students = students.concat(spec.students);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  students.forEach(student => {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${student.id}</td><td>${student.name}</td><td>${student.email}</td><td>${student.age}</td>`;
+    studentTableBody.appendChild(row);
+  });
+}
+
+// Event listeners
+universitySelect.addEventListener('change', function() {
+  populateDepartments(this.value);
+  showStudents();
+});
+
+departmentSelect.addEventListener('change', function() {
+  populateSpecializations(this.value);
+  showStudents();
+});
+
+specializationSelect.addEventListener('change', function() {
+  showStudents();
+});
+
+// Initial load
+populateUniversities();
+showStudents();
