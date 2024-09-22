@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="style.css" rel="stylesheet"> 
-  <title>University Student Filter</title>
-  
+  <title>University System</title>
 </head>
 <body>
-  <h1 style="text-align: center;">University, Department, Specialization Selection</h1>
+  <h1 style="text-align: center; color:brown;">University, Department, Specialization Selection</h1>
 
   <!-- University Dropdown -->
   <label for="university">Select University:</label>
@@ -28,7 +27,7 @@
     <option value="">All Specializations</option>
   </select>
 
-  <!-- Students Table -->
+  <!-- Table -->
   <table id="studentTable">
     <thead>
       <tr>
@@ -38,7 +37,9 @@
         <th>Age</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Student rows will be populated here dynamically -->
+    </tbody>
   </table>
 
   <script src="index.js"></script>
