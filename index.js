@@ -1,247 +1,143 @@
-const universities = [
-  {
-    id: 1,
-    name: "Superior University",
-    departments: [
-      {
-        id: 1,
-        name: "Department of Computer Science",
-        specializations: [
-          {
-            id: 1,
-            name: "Data Science",
-            students: [
-              { id: 1, name: "John Doe", email: "johndoe@example.com", age: 20 },
-              { id: 2, name: "Jane Doe", email: "janedoe@example.com", age: 22 }
-            ]
-          },
-          {
-            id: 2,
-            name: "Software Engineering",
-            students: [
-              { id: 3, name: "Bob Smith", email: "bobsmith@example.com", age: 25 }
-            ]
-          },
-          {
-            id: 3,
-            name: "Artificial Intelligence",
-            students: [
-              { id: 4, name: "Alice Johnson", email: "alicejohnson@example.com", age: 21 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 2,
-        name: "Department of Mathematics",
-        specializations: [
-          {
-            id: 4,
-            name: "Pure Mathematics",
-            students: [
-              { id: 5, name: "Mike Brown", email: "mikebrown@example.com", age: 24 }
-            ]
-          },
-          {
-            id: 5,
-            name: "Applied Mathematics",
-            students: [
-              { id: 6, name: "Emily Davis", email: "emilydavis@example.com", age: 23 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: "Punjab University",
-    departments: [
-      {
-        id: 3,
-        name: "Department of Languages",
-        specializations: [
-          {
-            id: 6,
-            name: "English",
-            students: [
-              { id: 7, name: "David Lee", email: "davidlee@example.com", age: 26 }
-            ]
-          },
-          {
-            id: 7,
-            name: "Urdu",
-            students: [
-              { id: 8, name: "Ayesha Khan", email: "ayeshakhan@example.com", age: 22 }
-            ]
-          },
-          {
-            id: 8,
-            name: "Spanish",
-            students: [
-              { id: 9, name: "Sofia Rodriguez", email: "sofiarodriguez@example.com", age: 25 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: "University of Lahore",
-    departments: [
-      {
-        id: 4,
-        name: "Department of Computer Science",
-        specializations: [
-          {
-            id: 9,
-            name: "Data Science",
-            students: [
-              { id: 10, name: "Ahmed Ali", email: "ahmedali@example.com", age: 24 }
-            ]
-          },
-          {
-            id: 10,
-            name: "Software Engineering",
-            students: [
-              { id: 11, name: "Fatima Hassan", email: "fatimahassan@example.com", age: 23 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: "COMSATS",
-    departments: [
-      {
-        id: 5,
-        name: "Department of Computer Science",
-        specializations: [
-          {
-            id: 11,
-            name: "Data Science",
-            students: [
-              { id: 12, name: "Muhammad Khan", email: "muhammadkhan@example.com", age: 25 }
-            ]
-          },
-          {
-            id: 12,
-            name: "Software Engineering",
-            students: [
-              { id: 13, name: "Ayesha Ahmed", email: "ayeshaahmed@example.com", age: 22 }
-            ]
-          }
-        ]
-      }
-    ]
+const universitySelect = document.getElementById("university");
+const departmentSelect = document.getElementById("department");
+const specializationSelect = document.getElementById("specialization");
+const informationTableBody = document.querySelector("#studentTable tbody");
+
+// Fetch universities data from the API
+async function fetchUniversities() {
+  try {
+    const response = await fetch("/api/universities");
+    if (!response.ok) throw new Error("Network response was not ok");
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch universities:", error);
+    return [];
   }
-];
+}
 
-const universitySelect = document.getElementById('university');
-const departmentSelect = document.getElementById('department');
-const specializationSelect = document.getElementById('specialization');
-const studentTableBody = document.querySelector('#studentTable tbody');
-
-// Populate universities dropdown
-function populateUniversities() {
-  universities.forEach(university => {
-    const option = document.createElement('option');
-    option.value = university.id;
-    option.textContent = university.name;
-    universitySelect.appendChild(option);
+// Populate select options
+function populateSelect(selectElement, options) {
+  selectElement.innerHTML = '<option value="">Select an option</option>'; // Reset options
+  options.forEach((option) => {
+    const opt = document.createElement("option");
+    opt.text = option.name;
+    opt.value = option.id;
+    selectElement.appendChild(opt);
   });
 }
 
-// Populate departments based on selected university
-function populateDepartments(universityId) {
-  departmentSelect.innerHTML = '<option value="">All Departments</option>';
-  specializationSelect.innerHTML = '<option value="">All Specializations</option>';
-  specializationSelect.disabled = true;
+// Populate the table with student data
+function populateTable(students) {
+  informationTableBody.innerHTML = ""; // Clear table
+  students.forEach((student) => {
+    const tableRow = document.createElement("tr");
+    tableRow.innerHTML = `
+      <td>${student.id}</td>
+      <td>${student.name}</td>
+      <td>${student.email}</td>
+      <td>${student.age}</td>
+    `;
+    informationTableBody.appendChild(tableRow);
+  });
+}
 
-  const university = universities.find(u => u.id == universityId);
+// Handle university selection change
+async function onUniversityChange(event) {
+  const selectedUniversityId = event.target.value;
+  const universities = await fetchUniversities();
+  const selectedUniversity = universities.find(
+    (university) => university.id === parseInt(selectedUniversityId)
+  );
 
-  if (university) {
-    university.departments.forEach(department => {
-      const option = document.createElement('option');
-      option.value = department.id;
-      option.textContent = department.name;
-      departmentSelect.appendChild(option);
-    });
+  if (selectedUniversity) {
+    populateSelect(departmentSelect, selectedUniversity.departments);
     departmentSelect.disabled = false;
-  } else {
-    departmentSelect.disabled = true;
-  }
-}
-
-// Populate specializations based on selected department
-function populateSpecializations(departmentId) {
-  specializationSelect.innerHTML = '<option value="">All Specializations</option>';
-
-  const university = universities.find(u => u.id == universitySelect.value);
-  const department = university?.departments.find(d => d.id == departmentId);
-
-  if (department) {
-    department.specializations.forEach(spec => {
-      const option = document.createElement('option');
-      option.value = spec.id;
-      option.textContent = spec.name;
-      specializationSelect.appendChild(option);
-    });
-    specializationSelect.disabled = false;
-  } else {
     specializationSelect.disabled = true;
+    specializationSelect.innerHTML =
+      '<option value="">Select a Specialization</option>';
+    populateTable(getAllStudents(universities)); 
+  } else {
+    departmentSelect.innerHTML =
+      '<option value="">Select a Department</option>';
+    departmentSelect.disabled = true;
+    specializationSelect.innerHTML =
+      '<option value="">Select a Specialization</option>';
+    specializationSelect.disabled = true;
+    populateTable(getAllStudents(universities)); 
   }
 }
 
-// Show students based on filters
-function showStudents() {
-  studentTableBody.innerHTML = '';
+// Handle department selection change
+async function onDepartmentChange(event) {
+  const selectedDepartmentId = event.target.value;
+  const selectedUniversityId = universitySelect.value;
+  const universities = await fetchUniversities();
+  const selectedUniversity = universities.find(
+    (university) => university.id === parseInt(selectedUniversityId)
+  );
+  const selectedDepartment = selectedUniversity.departments.find(
+    (department) => department.id === parseInt(selectedDepartmentId)
+  );
 
-  const universityId = universitySelect.value;
-  const departmentId = departmentSelect.value;
-  const specializationId = specializationSelect.value;
-
-  let students = [];
-
-  universities.forEach(university => {
-    if (!universityId || university.id == universityId) {
-      university.departments.forEach(department => {
-        if (!departmentId || department.id == departmentId) {
-          department.specializations.forEach(spec => {
-            if (!specializationId || spec.id == specializationId) {
-              students = students.concat(spec.students);
-            }
-          });
-        }
-      });
-    }
-  });
-
-  students.forEach(student => {
-    const row = document.createElement('tr');
-    row.innerHTML = `<td>${student.id}</td><td>${student.name}</td><td>${student.email}</td><td>${student.age}</td>`;
-    studentTableBody.appendChild(row);
-  });
+  if (selectedDepartment) {
+    populateSelect(specializationSelect, selectedDepartment.specializations);
+    specializationSelect.disabled = false;
+    populateTable(getAllStudents(universities)); // Show all students initially
+  } else {
+    specializationSelect.innerHTML =
+      '<option value="">Select a Specialization</option>';
+    specializationSelect.disabled = true;
+    populateTable(getAllStudents(universities)); // Show all students initially
+  }
 }
 
-// Event listeners
-universitySelect.addEventListener('change', function() {
-  populateDepartments(this.value);
-  showStudents();
-});
+// Handle specialization selection change
+async function onSpecializationChange(event) {
+  const selectedSpecializationId = event.target.value;
+  const selectedUniversityId = universitySelect.value;
+  const selectedDepartmentId = departmentSelect.value;
+  const universities = await fetchUniversities();
+  const selectedUniversity = universities.find(
+    (university) => university.id === parseInt(selectedUniversityId)
+  );
+  const selectedDepartment = selectedUniversity.departments.find(
+    (department) => department.id === parseInt(selectedDepartmentId)
+  );
+  const selectedSpecialization = selectedDepartment.specializations.find(
+    (specialization) => specialization.id === parseInt(selectedSpecializationId)
+  );
 
-departmentSelect.addEventListener('change', function() {
-  populateSpecializations(this.value);
-  showStudents();
-});
+  if (selectedSpecialization) {
+    populateTable(selectedSpecialization.students);
+  } else {
+    populateTable(getAllStudents(universities)); // Show all students if no specialization is selected
+  }
+}
 
-specializationSelect.addEventListener('change', function() {
-  showStudents();
-});
+// Get all students from the data
+function getAllStudents(universities) {
+  const allStudents = [];
+  universities.forEach((university) => {
+    university.departments.forEach((department) => {
+      department.specializations.forEach((specialization) => {
+        allStudents.push(...specialization.students);
+      });
+    });
+  });
+  return allStudents;
+}
 
-// Initial load
-populateUniversities();
-showStudents();
+// Initialize the selects and table
+async function initialize() {
+  const universities = await fetchUniversities();
+  populateSelect(universitySelect, universities);
+  universitySelect.addEventListener("change", onUniversityChange);
+  departmentSelect.addEventListener("change", onDepartmentChange);
+  specializationSelect.addEventListener("change", onSpecializationChange);
+
+  // Populate the table with all students initially
+  populateTable(getAllStudents(universities));
+}
+
+// Run initialization
+initialize();
